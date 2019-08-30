@@ -1,0 +1,26 @@
+%% FILE: fotf_nyqlog_dcm_update_fcn.m
+%% AUTHOR: Andreas Hanssen Moltumyr
+
+function txt = fotf_nyqlog_dcm_update_fcn(empt, event_obj, w, mag_dB, phase, real, imag)
+    idx = get(event_obj, 'DataIndex');
+    line_type = get(event_obj.Target, 'UserData');
+    
+    degree_symbol = char(176);
+    
+    switch line_type
+        case 'positive_nyquist_curve'
+            txt = {['Real: ', num2str(real(idx), '%0.4g')],...
+                   ['Imag: ', num2str(imag(idx), '%0.4g')],...
+                   ['Magnitude: ', num2str(mag_dB(idx)), ' dB'],...
+                   ['Phase: ',     num2str((180/pi)*phase(idx)), degree_symbol],...
+                   ['Frequency: ', num2str(w(idx), '%0.4g'), ' rad/s']};
+        case 'negative_nyquist_curve'
+            txt = {['Real: ', num2str(real(idx), '%0.4g')],...
+                   ['Imag: ', num2str(-imag(idx), '%0.4g')],...
+                   ['Magnitude: ', num2str(mag_dB(idx)), ' dB'],...
+                   ['Phase: ',     num2str(-(180/pi)*phase(idx)), degree_symbol],...
+                   ['Frequency: ', num2str(-w(idx), '%0.4g'), ' rad/s']};
+        otherwise
+            txt = {};
+    end
+end
