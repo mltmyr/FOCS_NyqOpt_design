@@ -1,9 +1,12 @@
 %% FILE: generate_optimization_result.m
+%% PURPOSE: Create diagrams to assess the performance of the optimized
+%%          controller and/or save results from data in workspace.
+%%          Run this after regulator_optimization_genetic_algorithm.m.
 %% AUTHOR: Andreas Hanssen Moltumyr
 
 %% Configuration/Options
 show_plots = true;
-save_results_and_plots = true;
+save_results_and_plots = false;
 
 %% Process configs/opts
 if show_plots
