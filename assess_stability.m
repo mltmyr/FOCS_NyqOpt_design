@@ -74,9 +74,30 @@ else
 end
 
 if isempty(x_dir)
-    dPsi_w_zero = calc_phase_change(G,0);
-    dPsi_w_inf  = calc_phase_change(G,inf);
-    dPsi_w_ninf  = calc_phase_change(G,-inf);
+    found_rotation = false;
+    i = 0;
+    while ~found_rotation
+        im_x_val_w_lowest  = IMAG(1+i);
+        im_x_val_w_highest = IMAG(length(IMAG)-i);
+        
+        if im_x_val_w_lowest == 0 && im_x_val_w_highest == 0
+            %error('Unable to specify');
+        elseif im_x_val_w_lowest >= 0 && im_x_val_w_highest >= 0
+            x_dir_w_zero = 1;
+            x_dir_w_inf  = -1;
+            found_rotation = true;
+        elseif im_x_val_w_lowest <= 0 && im_x_val_w_highest <= 0
+            x_dir_w_zero = -1;
+            x_dir_w_inf  = 1;
+            found_rotation = true;
+        else
+            %error('im_x_val_w_lowest and im_x_val_w_highest should have same sign when isempty(x_dir) == 0. Something wrong has happened!');
+        end
+        i = i+1;
+        if 1+i >= length(IMAG)-i
+            error('Could not decide on real-axis crossing direction for w=0 and w=inf');
+        end
+    end
 else
     x_dir_w_zero = -x_dir(1);
     x_dir_w_inf  = -x_dir(end);
@@ -161,7 +182,7 @@ for j = 1:size(stable_regions,2)
     k2 = stable_regions(2,j);
     e1 = 1/abs(k1);
     e2 = 1/abs(k2);
-    if sign(k1) == -1 && sign(k2) == -1
+    if sign(k1) == -1 && (sign(k2) == -1 || sign(k2) == 0)
         g_lower = e1;
         g_upper = e2;
         make_stable_gain_pairs = [make_stable_gain_pairs, [g_lower; g_upper]];
@@ -173,7 +194,7 @@ for j = 1:size(stable_regions,2)
         g_lower = -e2;
         g_upper = 0;
         make_stable_gain_pairs = [make_stable_gain_pairs, [g_lower; g_upper]];
-    elseif sign(k1) == 1 && sign(k2) == 1
+    elseif (sign(k1) == 1 || sign(k2) == 0) && sign(k2) == 1
         g_lower = -e2;
         g_upper = -e1;
         make_stable_gain_pairs = [make_stable_gain_pairs, [g_lower; g_upper]];
