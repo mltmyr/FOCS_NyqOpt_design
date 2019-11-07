@@ -1,7 +1,24 @@
-%% FILE: astep_fotf_freqresp.m
-%% AUTHOR: Andreas Hanssen Moltumyr
-
 function [re_out,im_out,mag_out,phase_out,w_out] = astep_fotf_freqresp(G, w_low, w_high)   
+    % ASTEP_FOTF_FREQRESP Calculate frequency response of fractional-order transfer function G
+    % with an adaptive stepping technique. re_out and im_out are vectors of real and imaginary
+    % values calculated at frequencies in vector w_out. mag_out and phase_out are the
+    % magnitude and phase values of the frequency response at frequencies w_out.
+    % 
+    % [re_out,im_out,mag_out,phase_out,w_out] = ASTEP_FOTF_FREQRESP(G) - Frequency response of G
+    % is evaluated and suitable lower and upper frequencies where the calculation should
+    % terminate are automatically found.
+    %
+    % [re_out,im_out,mag_out,phase_out,w_out] = ASTEP_FOTF_FREQRESP(G, w_low, w_high) - Frequency
+    % response of G is evaluated and the method stops when it moves outside the given frequency
+    % bounds w_low and w_high.
+    %
+    % Note: Used correctly, the adaptive stepping technique should make sure that the calculated
+    % frequency response is smooth in a logarithmic amplitude polar diagram. Frequency response
+    % values are calculated sporadically so there are no linear or logarithmic structure to
+    % the frequencies where the frequency response have been calculated.
+    %
+    % AUTHOR: Andreas Hanssen Moltumyr
+    
     %% Choose function behavior based on input arguments
     switch nargin
         case 1
@@ -39,7 +56,7 @@ function [re_out,im_out,mag_out,phase_out,w_out] = astep_fotf_freqresp(G, w_low,
     % Change startpoint of w. The algorithm is started two times from this
     % point. One calculates from startpoint_w and towards inf, while
     % the other one calculates from startpoint_w and towards zero.
-    startpoint_w                = 100;
+    startpoint_w                = 0.1;
     
     % If the algorithm only shows a circle or line (less than what you
     % would expect from the given fractional-order transfer function), then
