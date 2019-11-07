@@ -1,17 +1,18 @@
 %% FILE: regulator_optimization_genetic_algorithm.m
+%% PURPOSE: Run optimization based tuning of controller parameters.
 %% AUTHOR: Andreas Hanssen Moltumyr
 
 %% Load Plant Model
-ident_tfs = load('sample_tfs/sample_tfs.mat');
+ident_tfs = load('plant_models/afm_identified_tfs.mat');
 G = ident_tfs.tf9;
 G = fotf(G);
 
 %% Choice of controller/regulator to control plant, and optimize
-regulator_type = 'PPF';
+%regulator_type = 'PPF';
 %regulator_type = 'FO-PPF_1';
 %regulator_type = 'FO-PPF_2';
 %regulator_type = 'FO-PPF_3';
-%regulator_type = 'FO-PID';
+regulator_type = 'FO-PID';
 %regulator_type = 'PID';
 
 %% Regulator Options
@@ -30,7 +31,7 @@ switch regulator_type
         num_unstable_poles_open_loop = 0;
         %               [   k_t,     k_d, zeta_d, omega_d,   beta_d]
         lower_bound_x = [     1, 1*10^-3,    0.1,  5*10^2,     0.01];
-        upper_bound_x = [1*10^5,  1*10^3,      5,  1*10^6,     1.99];
+        upper_bound_x = [1*10^5,  1*10^3,      6,  1*10^6,     1.99];
     case 'FO-PPF_3'
         num_unstable_poles_open_loop = 0;
         %               [    k_t, alpha_t,     k_d, zeta_d, omega_d, beta_d]
@@ -39,13 +40,13 @@ switch regulator_type
     case 'FO-PID'
         num_unstable_poles_open_loop = 0;
         %               [    k_p,     k_i,     k_d, mu_i,  mu_d,    tau_f]
-        lower_bound_x = [1*10^-3,  1*10^0, 1*10^-3, 0.01,  0.01,   1*10^-2];
-        upper_bound_x = [ 1*10^2,  1*10^6,  1*10^2, 1.99,  1.99,   1*10^4];
+        lower_bound_x = [1*10^-9,  1*10^-2, 1*10^-6, 0.01,  0.01,   1*10^2];
+        upper_bound_x = [ 1*10^2,  1*10^7,  2*10^6, 1.99,  1.99,   5*10^5];
     case 'PID'
         num_unstable_poles_open_loop = 0;
         %               [    k_p,     k_i,     k_d,    tau_f]
-        lower_bound_x = [1*10^-8, 1*10^0, 1*10^0,  1*10^-2];
-        upper_bound_x = [ 1*10^2,  1*10^4,  1*10^4,   1*10^6];
+        lower_bound_x = [1*10^-4, 1*10^-4, 1*10^-4,  1*10^-4];
+        upper_bound_x = [ 1*10^4,  1*10^5,  1*10^4,   1*10^2];
     otherwise
         error('Choose a supported regulator or implement support for new regulator');
 end
@@ -63,7 +64,7 @@ num_elite_individuals = ceil(0.05*population_size);
 crossover_fraction    = 0.6;
 
 % Stopping Conditions
-max_num_generations   = 30;
+max_num_generations   = 10;
 
 max_stall_generations = 10;
 function_tolerance    = 1e-20;
