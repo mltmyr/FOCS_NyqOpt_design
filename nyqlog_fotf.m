@@ -1,7 +1,20 @@
-%% FILE: nyqlog_fotf.m
-%% AUTHOR: Andreas Hanssen Moltumyr
-
 function nyqlog_fotf(G,w1,w2)
+    % NYQLOG_FOTF Function for plotting a logarithmic amplitude polar diagram
+    % of a fractional-order transfer function (fotf object) or
+    % integer-order transfer function (tf object).
+    %
+    % nyqlog_fotf(G) G is the transfer function to plot. Uses the adaptive stepping
+    % function astep_fotf_freqresp(...) to calculate frequency response.
+    %
+    % nyqlog_fotf(G,w1) A vector of frequencies w1 can be specified if the diagram
+    % should be plotted for a set of specific frequencies. Uses the fotf/bode(...) function
+    % from the fotf toolbox to calculate frequency response.
+    % 
+    % nyqlog_fotf(G,w1,w2) A frequency interval can be specified with
+    % w1 (lower) and w2 (upper) if only a certain frequency range is needed.
+    %
+    % AUTHOR: Andreas Hanssen Moltumyr
+
     %% Input guard
     if isa(G, 'tf')
         G = fotf(G);
