@@ -1,7 +1,20 @@
-%% FILE: construct_system_fotfs.m
-%% AUTHOR: Andreas Hanssen Moltumyr
-
 function [L, T, So, misc] = construct_system_fotfs(G_plant, reg_type, reg_param)
+    % CONSTRUCT_SYSTEM_FOTFS Function where regulator parameters reg_param are
+    % converted to a fotf object (fractional-order transfer function) based on
+    % the identifier reg_type.
+    %
+    % [L, T, So, misc] = construct_system_fotfs(G_plant, reg_type, reg_param)
+    %
+    % Open-loop and Closed-loop transfer functions L(s),
+    % T(s) (Complementary sensitivity function) and So(s) (Sensitivity function)
+    % are also calculated and returned. Possible other interesting transfer functions
+    % and data can be returned as MISC.
+    %
+    % If other controllers than the ones defined here should be used and optimized, 
+    % necessary conversions and calculations should be added here.
+    %
+    % AUTHOR: Andreas Hanssen Moltumyr
+
     s = fotf('s');
     
     %% Input guard
