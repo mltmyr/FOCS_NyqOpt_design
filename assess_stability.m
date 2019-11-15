@@ -108,44 +108,71 @@ w_x_val  = [ w_x_val_w_zero,  w_x_val,  w_x_val_w_inf];
 x_dir    = [   x_dir_w_zero,    x_dir,    x_dir_w_inf];
 
 %% 3.) Calculate encirclements
-encircs = zeros(1,length(w_x_val)+1);
+encircs = zeros(1,length(re_x_val)+1);
 
-% Create lookup table to map frequency order with real axis crossing order
-lutbl = zeros(4,length(re_x_val));
-lutbl(1,:) = 1:length(re_x_val);
-lutbl(2,:) = re_x_val;
-lutbl(3,:) = w_x_val;
-lutbl(:,:) = sortrows(lutbl(:,:)',2)';
-lutbl(4,:) = 1:length(re_x_val);
-lutbl_2(:,:) = sortrows(lutbl(:,:)',1)';
+A = zeros(3,length(re_x_val));
+A(1,:) = re_x_val;
+A(2,:) =  w_x_val;
+A(:,:) = sortrows(A',1)';
+A(3,:) = 1:length(re_x_val);
 
-for j = 1:length(w_x_val)-1
-    % Find which values in encircs that should add rotations
-    k1 = lutbl_2(4,j);
-    k2 = lutbl_2(4,j+1);
-    if k1 > k2
-        k_values = k2:k1;
-    else
-        k_values = k1:k2;
+B(:,:) = sortrows(A',2)';
+
+for j = 1:length(re_x_val)-1
+    segsEncirced = (B(3,j)+1):B(3,j+1);
+    if isempty(segsEncirced)
+        segsEncirced = (B(3,j+1)+1):B(3,j);
     end
-    k_values = k_values(1:end-1);
     
-    % Check real axis crossing direction and if the value from one crossing
-    % is lesser than or greater than the next. Add encirclements according
-    % to these checks.
-    if (x_dir(j) == -1 && re_x_val(j) > re_x_val(j+1)) || ...
-       (x_dir(j) ==  1 && re_x_val(j) < re_x_val(j+1))
-        encircs(k_values+1) = encircs(k_values+1) - 1;
-    elseif (x_dir(j) ==  1 && re_x_val(j) > re_x_val(j+1)) || ...
-           (x_dir(j) == -1 && re_x_val(j) < re_x_val(j+1))
-        encircs(k_values+1) = encircs(k_values+1) + 1;
+    dir = x_dir(j);
+    dRe = re_x_val(j) - re_x_val(j+1);
+    if     (dir == -1 && dRe > 0) || (dir ==  1 && dRe < 0)
+        encircs(segsEncirced) = encircs(segsEncirced) - 1;
+    elseif (dir ==  1 && dRe > 0) || (dir == -1 && dRe < 0)
+        encircs(segsEncirced) = encircs(segsEncirced) + 1;
+    else
+        warning('dRe should not be zero. dir should be 1 or -1');
     end
 end
 
+%encircs = zeros(1,length(w_x_val)+1);
+%
+% Create lookup table to map frequency order with real axis crossing order
+%lutbl = zeros(4,length(re_x_val));
+%lutbl(1,:) = 1:length(re_x_val);
+%lutbl(2,:) = re_x_val;
+%lutbl(3,:) = w_x_val;
+%lutbl(:,:) = sortrows(lutbl(:,:)',2)';
+%lutbl(4,:) = 1:length(re_x_val);
+%lutbl_2(:,:) = sortrows(lutbl(:,:)',1)';
+%
+%for j = 1:length(w_x_val)-1
+%    % Find which values in encircs that should be modified with encirclements
+%    k1 = lutbl_2(4,j);
+%    k2 = lutbl_2(4,j+1);
+%    if k1 > k2
+%        k_values = k2:k1;
+%    else
+%        k_values = k1:k2;
+%    end
+%    k_values = k_values(1:end-1);
+%    
+%    % Check real axis crossing direction and if the value from one crossing
+%    % is lesser than or greater than the next. Add encirclements according
+%    % to these checks.
+%    if (x_dir(j) == -1 && re_x_val(j) > re_x_val(j+1)) || ...
+%       (x_dir(j) ==  1 && re_x_val(j) < re_x_val(j+1))
+%        encircs(k_values+1) = encircs(k_values+1) - 1;
+%    elseif (x_dir(j) ==  1 && re_x_val(j) > re_x_val(j+1)) || ...
+%           (x_dir(j) == -1 && re_x_val(j) < re_x_val(j+1))
+%        encircs(k_values+1) = encircs(k_values+1) + 1;
+%    end
+%end
+
 %% 4.) Find stable regions
 region_data_encircs           = encircs;
-region_data_lower_real_value  = [-inf, lutbl(2,1:end)];
-region_data_higher_real_value = [lutbl(2,1:end),  inf];
+region_data_lower_real_value  = [-inf, A(1,1:end)];
+region_data_higher_real_value = [A(1,1:end),  inf];
 
 if region_data_lower_real_value(1)  == -inf && ...
    region_data_higher_real_value(1) == -inf
